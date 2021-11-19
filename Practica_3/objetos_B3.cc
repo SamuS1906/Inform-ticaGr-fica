@@ -44,6 +44,17 @@ glEnd();*/
 
 _triangulos3D::_triangulos3D()
 {
+	r = 0.0;
+	g = 0.5;
+	b = 0.7;
+  //color por defecto
+}
+
+//cambiar color
+void _triangulos3D::change_color (vector<float> color, int size){
+	r = color[size-3];
+	g = color[size-2];
+	b = color[size-1];
 }
 
 
@@ -51,7 +62,7 @@ _triangulos3D::_triangulos3D()
 // dibujar en modo arista
 //*************************************************************************
 
-void _triangulos3D::draw_aristas(float r, float g, float b, int grosor)
+void _triangulos3D::draw_aristas(int grosor)
 {
 //**** usando vertex_array ****
 glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -79,7 +90,7 @@ glEnd();*/
 // dibujar en modo sólido
 //*************************************************************************
 
-void _triangulos3D::draw_solido(float r, float g, float b)
+void _triangulos3D::draw_solido()
 {
 int i;
 
@@ -98,13 +109,13 @@ glEnd();
 // dibujar en modo sólido con apariencia de ajedrez
 //*************************************************************************
 
-void _triangulos3D::draw_solido_ajedrez(float r1, float g1, float b1, float r2, float g2, float b2)
+void _triangulos3D::draw_solido_ajedrez(float r2, float g2, float b2)
 {
 int i;
 glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 glBegin(GL_TRIANGLES);
 for (i=0;i<caras.size();i++){
-	if (i%2==0) glColor3f(r1,g1,b1);
+	if (i%2==0) glColor3f(r,g,b);
 	else glColor3f(r2,g2,b2);
 	glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
 	glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
@@ -117,13 +128,15 @@ glEnd();
 // dibujar con distintos modos
 //*************************************************************************
 
-void _triangulos3D::draw(_modo modo, float r1, float g1, float b1, float r2, float g2, float b2, float grosor)
+
+void _triangulos3D::draw(_modo modo, float r2, float g2, float b2, float grosor)
 {
 switch (modo){
-	case POINTS:draw_puntos(r1, g1, b1, grosor);break;
-	case EDGES:draw_aristas(r1, g1, b1, grosor);break;
-	case SOLID_CHESS:draw_solido_ajedrez(r1, g1, b1, r2, g2, b2);break;
-	case SOLID:draw_solido(r1, g1, b1);break;
+	case POINTS:draw_puntos(r2,g2,b2,grosor);break;
+	case EDGES:draw_aristas(grosor);break;
+	case SOLID_CHESS:draw_solido_ajedrez(r2, g2, b2);break;
+	case SOLID:draw_solido();break;
+	case ALL: draw_puntos(r2, g2, b2, grosor); draw_aristas(grosor); draw_solido_ajedrez(r2, g2, b2); break;
 	}
 }
 
@@ -806,18 +819,604 @@ void _rotacion::parametros(vector<_vertex3f> perfil, int num, char eje)
 	}
 }
 
-//
-// Cilindro para paso de rueda
-//
 
 
-//
-// Chasis parte frontal derecha (con paso de rueda) 
-//
-_paso_de_rueda_der::_paso_de_rueda_der(){
+
+
+//******************************************************************************************
+// UMBRELA
+//******************************************************************************************
+
+
+
+_umbrela::_umbrela(){
+	
+	vector<_vertex3f>  perfil;
+	_vertex3f aux;
+
+	//puntos rotacion
+	int i;
+	double n=10, radio=100;
+	for(i=1; i<n; i++){
+		aux.x = i;
+		aux.y= sqrt(radio-(pow(i,2)));
+		aux.z=0;
+		perfil.push_back(aux);
+		
+	}
+
+	aux.x=10;
+	aux.y=2.492798;
+	aux.z=0;
+	perfil.push_back(aux);
+	aux.x=11;
+	aux.y=0.381697;
+	aux.z=0;
+	perfil.push_back(aux);
+	aux.x=10;
+	aux.y=-2;
+	aux.z=0;
+	perfil.push_back(aux);
+	
+	semiesfera.parametros(perfil, 60, 'x');
+
+}
+void _umbrela::draw(_modo modo, float r2, float g2, float b2, float grosor)
+{
+
+	glPushMatrix();
+	glTranslatef(0,0,0);
+	semiesfera.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+	
+}
+
+//******************************************************************************************
+// Tentaculos orales
+//******************************************************************************************
+_tentaculos_orales::_tentaculos_orales(){
+
+	vector<_vertex3f> perfil2,perfil1;
+	_vertex3f aux;
+
+	//puntos cilindro
+	aux.x=1.0; aux.y=1.0; aux.z=0.0;
+	perfil1.push_back(aux);
+	aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+	perfil1.push_back(aux);
+
+	cilindro1.parametros(perfil1,20);
+	cilindro2.parametros(perfil1,20);
+	cilindro3.parametros(perfil1,20);
+
+
+	//puntos cono
+	aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+	perfil2.push_back(aux);
+	aux.x=1; aux.y=0.5; aux.z=0.0;
+	perfil2.push_back(aux);
+	aux.x=1.0; aux.y=1.0; aux.z=0.0;
+	perfil2.push_back(aux);
+
+	cono1.parametros(perfil2,16,2);
+	cono2.parametros(perfil2,16,2);	
+	cono3.parametros(perfil2,16,2);
+
+
+	n = 15;
+	m = 15;
+	radio = 2;
+	
+	esfera1.parametros(n,m,radio);
+	esfera2.parametros(n,m,radio);
+}
+
+void _tentaculos_orales::draw(_modo modo, float r2, float g2, float b2, float grosor){
+	
+
+		glPushMatrix();
+		glTranslatef(0,-5.0,0);
+		glScalef(2.0,3.0,2);
+		cilindro1.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+		
+	glPushMatrix();
+	glRotatef(giroOrales, 0, 1, 0);
+
+		glPushMatrix();	
+		glTranslatef(0.0,-8.8,0.0);
+		glRotatef(180.0,0,0,1);
+		glScalef(2.0,0.8,2.0);		
+		cono1.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-1.8,-9.8,0);
+		glRotatef(-50,0,0,1);
+		glScalef(1.3,1.0,1.3);
+		cilindro2.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(1.8,-9.8,0);
+		glRotatef(50,0,0,1);
+		glScalef(1.3,1.0,1.3);
+		cilindro3.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glPushMatrix();	
+		glTranslatef(-3.4,-11,0.0);
+		glRotatef(-230.0,0,0,1);
+		glScalef(0.5,0.5,0.5);	
+		esfera1.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+		
+		glPushMatrix();	
+		glTranslatef(3.4,-11,0.0);
+		glRotatef(230.0,0,0,1);
+		glScalef(0.5,0.5,0.5);	
+		esfera2.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glPushMatrix();	
+		glTranslatef(3.7,-15.4,0.0);
+		glRotatef(180.0,0,0,1);
+		glScalef(1.4,3.4,1.4);		
+		cono3.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glPushMatrix();	
+		glTranslatef(-3.7,-15.4,0.0);
+		glRotatef(180.0,0,0,1);
+		glScalef(1.4,3.4,1.4);		
+		cono2.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+
+	glPopMatrix();
 
 }
 
-void _paso_de_rueda_der(_modo modo, float r2, float g2, float b2, float grosor){
+float _tentaculos_orales::getGiro(){
+	return giroOrales;
+}
 
+void _tentaculos_orales::setGiro(float valor){
+	giroOrales += valor;
+}
+
+//******************************************************************************************
+// Tentaculos venenosos
+//******************************************************************************************
+_tentaculos_venenosos::_tentaculos_venenosos(){
+	
+	vector<_vertex3f> perfil2,perfil1;
+	_vertex3f aux;
+
+	flexion1Max=45;
+	flexion1Min=-20;
+
+	flexion2Max=20;
+	flexion2Min=-20;
+
+	flexion3Max=10;
+	flexion3Min=-15;
+
+	flexion4Max=5;
+	flexion4Min=-15;
+
+	//puntos cilindro
+	aux.x=1.0; aux.y=0.0; aux.z=0.0;
+	perfil1.push_back(aux);
+	aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+	perfil1.push_back(aux);
+
+	cilindro1.parametros(perfil1,20);
+	cilindro2.parametros(perfil1,20);
+	cilindro3.parametros(perfil1,20);
+	
+	//puntos cono
+	aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+	perfil2.push_back(aux);
+	aux.x=1; aux.y=0.5; aux.z=0.0;
+	perfil2.push_back(aux);
+	aux.x=1.0; aux.y=1.0; aux.z=0.0;
+	perfil2.push_back(aux);
+
+	cono1.parametros(perfil2,16,2);
+
+	n = 15;
+	m = 15;
+	radio = 2;
+	
+	esfera1.parametros(n,m,radio);
+	esfera2.parametros(n,m,radio);
+	esfera3.parametros(n,m,radio);
+	esfera4.parametros(n,m,radio);
+}
+
+void _tentaculos_venenosos::draw(_modo modo, float r2, float g2, float b2, float grosor){
+	
+
+
+		glPushMatrix();
+		glTranslatef(0,-2.4,0);
+		glScalef(0.2,0.2,0.2);
+		esfera1.draw(modo, r2, g2, b2, grosor);
+		glPopMatrix();
+
+		glTranslatef(0,-2.8,0);
+// UNO		
+		glPushMatrix();
+		glRotatef(flexion1,1,0,0);			
+			glPushMatrix();
+			
+			glScalef(0.3,8.0,0.3);
+			cilindro1.draw(modo, r2, g2, b2, grosor);
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslatef(0,-8.4,0);
+			glScalef(0.2,0.2,0.2);
+			esfera2.draw(modo, r2, g2, b2, grosor);
+			glPopMatrix();
+
+			glTranslatef(0,-8.8,0);
+// DOS
+			glPushMatrix();
+			glRotatef(flexion2,1,0,0);
+				glPushMatrix();
+				
+				glScalef(0.3,8.0,0.3);
+				cilindro2.draw(modo, r2, g2, b2, grosor);
+				glPopMatrix();
+
+				glPushMatrix();
+				glTranslatef(0,-8.4,0);
+				glScalef(0.2,0.2,0.2);
+				esfera3.draw(modo, r2, g2, b2, grosor);
+				glPopMatrix();
+
+				glTranslatef(0,-8.8,0);
+// TRES
+				glPushMatrix();
+				glRotatef(flexion3,1,0,0);
+					glPushMatrix();
+					
+					glScalef(0.3,8.0,0.3);
+					cilindro3.draw(modo, r2, g2, b2, grosor);
+					glPopMatrix();
+
+					glPushMatrix();
+					glTranslatef(0,-8.4,0);
+					glScalef(0.2,0.2,0.2);
+					esfera4.draw(modo, r2, g2, b2, grosor);
+					glPopMatrix();
+
+                 glTranslatef(0,-8.8,0);
+// CUATRO           
+					
+						glPushMatrix();
+						
+						glRotatef(flexion4,1,0,0);
+						glTranslatef(0,-4,0);
+						glRotatef(180.0,0,0,1);
+						glScalef(0.3,4.0,0.3);
+						cono1.draw(modo, r2, g2, b2, grosor);
+					
+					    glPopMatrix();//CUATRO
+				glPopMatrix();//TRES
+			glPopMatrix();// DOS
+		glPopMatrix(); //UNO
+}
+
+float _tentaculos_venenosos::getFlexion1(){
+		return flexion1;
+}
+float _tentaculos_venenosos::getFlexion2(){
+		return flexion2;
+}
+float _tentaculos_venenosos::getFlexion3(){
+		return flexion3;
+}
+float _tentaculos_venenosos::getFlexion4(){
+		return flexion4;
+}
+float _tentaculos_venenosos::getMAXFlexion1(){
+		return flexion1Max;
+}
+float _tentaculos_venenosos::getMINFlexion1(){
+		return flexion1Min;
+}
+float _tentaculos_venenosos::getMAXFlexion2(){
+		return flexion2Max;
+}
+float _tentaculos_venenosos::getMINFlexion2(){
+		return flexion2Min;
+}
+float _tentaculos_venenosos::getMAXFlexion3(){
+		return flexion3Max;
+}
+float _tentaculos_venenosos::getMINFlexion3(){
+		return flexion3Min;
+}
+float _tentaculos_venenosos::getMAXFlexion4(){
+		return flexion4Max;
+}
+float _tentaculos_venenosos::getMINFlexion4(){
+		return flexion4Min;
+}
+
+void _tentaculos_venenosos::setFlexion1(float valor){
+
+	if(flexion1 + valor > flexion1Max){
+		flexion1 = flexion1Max;
+	}else if(flexion1 + valor < flexion1Min){
+		flexion1 = flexion1Min;
+	}
+	flexion1+=valor;
+
+}
+void _tentaculos_venenosos::setFlexion2(float valor){
+	
+	if(flexion2 + valor > flexion2Max){
+		flexion2 = flexion2Max;
+	}else if(flexion2 + valor < flexion2Min){
+		flexion2 = flexion2Min;
+	}
+	flexion2+=valor;
+
+}
+void _tentaculos_venenosos::setFlexion3(float valor){
+
+	if(flexion3 + valor > flexion3Max){
+		flexion3 = flexion3Max;
+	}else if(flexion3 + valor < flexion3Min){
+		flexion3 = flexion3Min;
+	}
+	flexion3+=valor;
+
+}
+void _tentaculos_venenosos::setFlexion4(float valor){
+	
+	if(flexion4 + valor > flexion4Max){
+		flexion4 = flexion4Max;
+	}else if(flexion4 + valor < flexion4Min){
+		flexion4 = flexion4Min;
+	}
+	flexion4+=valor;
+
+}
+
+
+
+//************************************************************************
+// MEDUSA
+//************************************************************************
+_medusa::_medusa(){
+
+
+}
+
+float _medusa::getGiroTentaculosOrales(){
+	return tentaculos_orales.getGiro();
+}
+
+void _medusa::setGiroTentaculosOrales(float valor){
+	tentaculos_orales.setGiro(valor);
+}
+
+
+//Primer bloque
+float _medusa::getFlexion11(){
+	return tentaculos_venenosos1.getFlexion1();
+}
+float _medusa::getFlexion12(){
+	return tentaculos_venenosos2.getFlexion1();
+}
+float _medusa::getFlexion13(){
+	return tentaculos_venenosos3.getFlexion1();
+}
+float _medusa::getFlexion14(){
+	return tentaculos_venenosos4.getFlexion1();
+}
+float _medusa::getFlexion15(){
+	return tentaculos_venenosos5.getFlexion1();
+}
+float _medusa::getFlexion16(){
+	return tentaculos_venenosos6.getFlexion1();
+}
+float _medusa::getFlexion17(){
+	return tentaculos_venenosos7.getFlexion1();
+}
+float _medusa::getFlexion18(){
+	return tentaculos_venenosos8.getFlexion1();
+}
+
+//Segundo bloque
+float _medusa::getFlexion21(){
+	return tentaculos_venenosos1.getFlexion2();
+}
+float _medusa::getFlexion22(){
+	return tentaculos_venenosos2.getFlexion2();
+}
+float _medusa::getFlexion23(){
+	return tentaculos_venenosos3.getFlexion2();
+}
+float _medusa::getFlexion24(){
+	return tentaculos_venenosos4.getFlexion2();
+}
+float _medusa::getFlexion25(){
+	return tentaculos_venenosos5.getFlexion2();
+}
+float _medusa::getFlexion26(){
+	return tentaculos_venenosos6.getFlexion2();
+}
+float _medusa::getFlexion27(){
+	return tentaculos_venenosos7.getFlexion2();
+}
+float _medusa::getFlexion28(){
+	return tentaculos_venenosos8.getFlexion2();
+}
+//Tercer bloque
+float _medusa::getFlexion31(){
+	return tentaculos_venenosos1.getFlexion3();
+}
+float _medusa::getFlexion32(){
+	return tentaculos_venenosos2.getFlexion3();
+}
+float _medusa::getFlexion33(){
+	return tentaculos_venenosos3.getFlexion3();
+}
+float _medusa::getFlexion34(){
+	return tentaculos_venenosos4.getFlexion3();
+}
+float _medusa::getFlexion35(){
+	return tentaculos_venenosos5.getFlexion3();
+}
+float _medusa::getFlexion36(){
+	return tentaculos_venenosos6.getFlexion3();
+}
+float _medusa::getFlexion37(){
+	return tentaculos_venenosos7.getFlexion3();
+}
+float _medusa::getFlexion38(){
+	return tentaculos_venenosos8.getFlexion3();
+}
+
+//Cuarto bloque
+float _medusa::getFlexion41(){
+	return tentaculos_venenosos1.getFlexion4();
+}
+float _medusa::getFlexion42(){
+	return tentaculos_venenosos2.getFlexion4();
+}
+float _medusa::getFlexion43(){
+	return tentaculos_venenosos3.getFlexion4();
+}
+float _medusa::getFlexion44(){
+	return tentaculos_venenosos4.getFlexion4();
+}
+float _medusa::getFlexion45(){
+	return tentaculos_venenosos5.getFlexion4();
+}
+float _medusa::getFlexion46(){
+	return tentaculos_venenosos6.getFlexion4();
+}
+float _medusa::getFlexion47(){
+	return tentaculos_venenosos7.getFlexion4();
+}
+float _medusa::getFlexion48(){
+	return tentaculos_venenosos8.getFlexion4();
+}
+
+void _medusa::setFlexion1(float valor){
+
+	tentaculos_venenosos1.setFlexion1(valor);
+	tentaculos_venenosos2.setFlexion1(valor);
+	tentaculos_venenosos3.setFlexion1(valor);
+	tentaculos_venenosos4.setFlexion1(valor);
+	tentaculos_venenosos5.setFlexion1(valor);
+	tentaculos_venenosos6.setFlexion1(valor);
+	tentaculos_venenosos7.setFlexion1(valor);
+	tentaculos_venenosos8.setFlexion1(valor);
+
+}
+void _medusa::setFlexion2(float valor){
+
+	tentaculos_venenosos1.setFlexion2(valor);
+	tentaculos_venenosos2.setFlexion2(valor);
+	tentaculos_venenosos3.setFlexion2(valor);
+	tentaculos_venenosos4.setFlexion2(valor);
+	tentaculos_venenosos5.setFlexion2(valor);
+	tentaculos_venenosos6.setFlexion2(valor);
+	tentaculos_venenosos7.setFlexion2(valor);
+	tentaculos_venenosos8.setFlexion2(valor);
+	
+}
+void _medusa::setFlexion3(float valor){
+
+	tentaculos_venenosos1.setFlexion3(valor);
+	tentaculos_venenosos2.setFlexion3(valor);
+	tentaculos_venenosos3.setFlexion3(valor);
+	tentaculos_venenosos4.setFlexion3(valor);
+	tentaculos_venenosos5.setFlexion3(valor);
+	tentaculos_venenosos6.setFlexion3(valor);
+	tentaculos_venenosos7.setFlexion3(valor);
+	tentaculos_venenosos8.setFlexion3(valor);	
+
+}
+void _medusa::setFlexion4(float valor){
+
+	tentaculos_venenosos1.setFlexion4(valor);
+	tentaculos_venenosos2.setFlexion4(valor);
+	tentaculos_venenosos3.setFlexion4(valor);
+	tentaculos_venenosos4.setFlexion4(valor);
+	tentaculos_venenosos5.setFlexion4(valor);
+	tentaculos_venenosos6.setFlexion4(valor);
+	tentaculos_venenosos7.setFlexion4(valor);
+	tentaculos_venenosos8.setFlexion4(valor);
+
+}
+
+
+void _medusa::draw(_modo modo, float r2, float g2, float b2, float grosor){
+	
+	glPushMatrix();
+	glTranslatef(0,0,0);
+	umbrela.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0,0,0);
+	tentaculos_orales.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(9.5,0,0);
+	glRotatef(-90, 0, 1, 0);
+	tentaculos_venenosos1.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-9.5,0,0);
+	glRotatef(90, 0, 1, 0);
+	tentaculos_venenosos2.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0,0,9.5);
+	glRotatef(180, 0, 1, 0);	
+	tentaculos_venenosos3.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+
+	glPushMatrix();
+	glTranslatef(0,0,-9.5);
+	tentaculos_venenosos4.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(6.71,0,6.71);
+	glRotatef(-135, 0, 1, 0);
+	tentaculos_venenosos5.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-6.71,0,6.71);
+	glRotatef(135, 0, 1, 0);
+	tentaculos_venenosos6.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-6.71,0,-6.71);
+	glRotatef(45, 0, 1, 0);
+	tentaculos_venenosos7.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(6.71,0,-6.71);
+	glRotatef(-45, 0, 1, 0);	
+	tentaculos_venenosos8.draw(modo, r2, g2, b2, grosor);
+	glPopMatrix();
 }

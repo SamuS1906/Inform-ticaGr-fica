@@ -1,5 +1,5 @@
 //**************************************************************************
-// Práctica 3 usando objetos
+// Práctica 1 usando objetos
 //**************************************************************************
 
 #include <GL/glut.h>
@@ -12,7 +12,7 @@
 using namespace std;
 
 // tipos
-typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION, ARTICULADO} _tipo_objeto;
+typedef enum{CUBO, PIRAMIDE, OBJETO_PLY, ROTACION, CILINDRO, ESFERA, CONO, UMBRELA, MEDUSA} _tipo_objeto;
 _tipo_objeto t_objeto=CUBO;
 _modo   modo=POINTS;
 
@@ -33,7 +33,15 @@ _cubo cubo;
 _piramide piramide(0.85,1.3);
 _objeto_ply  ply; 
 _rotacion rotacion; 
+_cilindro cilindro;
+_cono cono;
+_esfera esfera;
+_umbrela umbrela;
+_medusa medusa;
 
+float valor=1;
+bool animacion = false;
+float flag=0;
 // _objeto_ply *ply1;
 
 
@@ -112,11 +120,15 @@ void draw_objects()
 {
 
 switch (t_objeto){
-	case CUBO: cubo.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
-	case PIRAMIDE: piramide.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
-        case OBJETO_PLY: ply.draw(modo,1.0,0.6,0.0,0.0,1.0,0.3,2);break;
-        case ROTACION: rotacion.draw(modo,1.0,0.0,0.0,0.0,1.0,0.0,2);break;
-        case ARTICULADO: ;break;
+	case CUBO: cubo.draw(modo,1.0,0.0,0.0,2.0);break;
+	case PIRAMIDE: piramide.draw(modo,1.0,0.0,0.0,2.0);break;
+	case OBJETO_PLY: ply.draw(modo,1.0,0.6,0.0,2.0);break;
+	case ROTACION: rotacion.draw(modo,1.0,0.0,0.0,2.0);break;
+	case CILINDRO: cilindro.draw(modo,1.0,0.0,0.0,2.0);break;
+	case CONO: cono.draw(modo,1.0,0.0,0.0,2.0);break;
+	case ESFERA: esfera.draw(modo,1.0,0.0,0.0,2.0);break;
+	case UMBRELA: umbrela.draw(modo,1.0,0.0,0.0,2.0);break;
+	case MEDUSA: medusa.draw(modo,1.0,0.0,0.0,2.0);break;
 	}
 
 }
@@ -175,11 +187,26 @@ switch (toupper(Tecla1)){
 	case '2':modo=EDGES;break;
 	case '3':modo=SOLID;break;
 	case '4':modo=SOLID_CHESS;break;
-        case 'P':t_objeto=PIRAMIDE;break;
-        case 'C':t_objeto=CUBO;break;
-        case 'O':t_objeto=OBJETO_PLY;break;	
-        case 'R':t_objeto=ROTACION;break;
-        case 'A':t_objeto=ARTICULADO;break;
+	// case 'P':t_objeto=PIRAMIDE;break;
+	// case 'C':t_objeto=CUBO;break;
+	// case 'O':t_objeto=OBJETO_PLY;break;	
+	// case 'R':t_objeto=ROTACION;break;
+	// case 'Z':t_objeto=CILINDRO;break;
+	// case 'X':t_objeto=CONO;break;
+	// case 'V':t_objeto=ESFERA;break;
+	// case 'S':t_objeto=UMBRELA;break;
+	case 'M':t_objeto=MEDUSA;break;
+	case 'A':
+		if(animacion){
+			animacion = false;
+			flag=4;
+		}else{
+			animacion = true;
+			flag=0;
+		}
+		break;
+	case 'B':valor+=0.5;if(valor>4) valor=4;break;
+	case 'V':valor-=0.5;if(valor<0) valor=0.5;break; 
 	}
 glutPostRedisplay();
 }
@@ -204,12 +231,81 @@ switch (Tecla1){
 	case GLUT_KEY_DOWN:Observer_angle_x++;break;
 	case GLUT_KEY_PAGE_UP:Observer_distance*=1.2;break;
 	case GLUT_KEY_PAGE_DOWN:Observer_distance/=1.2;break;
-        //Articulciones
+
+	case GLUT_KEY_F1:medusa.setGiroTentaculosOrales(-valor);break;
+	case GLUT_KEY_F2:medusa.setGiroTentaculosOrales(valor);break;
+
+	case GLUT_KEY_F3:medusa.setFlexion1(-valor);break;
+	case GLUT_KEY_F4:medusa.setFlexion1(valor);break;
+
+	case GLUT_KEY_F5:medusa.setFlexion2(-valor);break;
+	case GLUT_KEY_F6:medusa.setFlexion2(valor);break;
+
+	case GLUT_KEY_F7:medusa.setFlexion3(-valor);break;
+	case GLUT_KEY_F8:medusa.setFlexion3(valor);break;
+
+	case GLUT_KEY_F9:medusa.setFlexion4(-valor);break;
+	case GLUT_KEY_F10:medusa.setFlexion4(valor);break;
+
 	}
 glutPostRedisplay();
 }
 
+//***************************************************************************
+// Funcion de animación
+//***************************************************************************
 
+void funcion_idle(){
+
+	if(animacion){
+
+		//patas centrales 
+		if(flag ==0){
+			medusa.setFlexion1(valor);
+			medusa.setFlexion2(-valor);
+			medusa.setFlexion3(-valor);
+			medusa.setFlexion4(-valor);
+		}
+		
+		if(medusa.getFlexion14() == (45+valor) && medusa.getFlexion41()==(-15-valor) && flag==0)
+		{
+			flag=1;
+		}
+		if(flag ==1){
+			medusa.setFlexion1(-valor);
+			medusa.setFlexion2(valor);
+			medusa.setFlexion3(valor);
+			medusa.setFlexion4(valor);
+		}
+
+		if(medusa.getFlexion14() == (-20-valor) && medusa.getFlexion41()== (5+valor)  && flag==1)
+		{
+
+			flag=2;
+		}
+		if(flag ==2){
+			medusa.setFlexion1(valor);
+			medusa.setFlexion2(-valor);
+			medusa.setFlexion3(-valor);
+			medusa.setFlexion4(-valor);
+		}
+		
+		if(medusa.getFlexion14() == (-20-valor) && medusa.getFlexion41()== (-15-valor) && flag==2)
+		{
+			
+			flag=3;
+		}
+		if(flag ==3){
+			
+			medusa.setFlexion1(-valor);			
+			medusa.setFlexion2(valor);
+			medusa.setFlexion3(valor);
+			medusa.setFlexion4(valor);
+		}
+		medusa.setGiroTentaculosOrales(valor);
+		glutPostRedisplay();
+	}
+}
 
 //***************************************************************************
 // Funcion de incializacion
@@ -251,42 +347,36 @@ glViewport(0,0,Window_width,Window_high);
 //***************************************************************************
 
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[] )
 {
  
 
-// creación del objeto ply
-
-ply.parametros(argv[1]);
 
 
 // perfil 
 
-vector<_vertex3f> perfil2;
+vector<_vertex3f> perfil1, perfil2, perfil3;
 _vertex3f aux;
-aux.x=1.0;aux.y=-1.4;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=1.0;aux.y=-1.1;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.5;aux.y=-0.7;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.4;aux.y=-0.4;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.4;aux.y=0.5;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.5;aux.y=0.6;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.3;aux.y=0.6;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.5;aux.y=0.8;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.55;aux.y=1.0;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.5;aux.y=1.2;aux.z=0.0;
-perfil2.push_back(aux);
-aux.x=0.3;aux.y=1.4;aux.z=0.0;
-perfil2.push_back(aux);
-rotacion.parametros(perfil2,6,1);
+
+
+//puntos cilindro
+aux.x=1.0; aux.y=0.0; aux.z=0.0;
+perfil1.push_back(aux);
+aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+perfil1.push_back(aux);
+
+//puntos cono
+aux.x=1.0; aux.y=-1.0; aux.z=0.0;
+perfil3.push_back(aux);
+aux.x=1; aux.y=0.5; aux.z=0.0;
+perfil3.push_back(aux);
+aux.x=1.0; aux.y=1.0; aux.z=0.0;
+perfil3.push_back(aux);
+
+
+cilindro.parametros(perfil1,20);
+cono.parametros(perfil3,16,2);
+esfera.parametros(20,24,2);
 
 
 // se llama a la inicialización de glut
@@ -322,8 +412,15 @@ glutKeyboardFunc(normal_key);
 // asignación de la funcion llamada "tecla_Especial" al evento correspondiente
 glutSpecialFunc(special_key);
 
+
+glutIdleFunc(funcion_idle);
 // funcion de inicialización
 initialize();
+
+// creación del objeto ply
+ply.parametros(argv[1]);
+
+//ply1 = new _objeto_ply(argv[1]);
 
 // inicio del bucle de eventos
 glutMainLoop();
