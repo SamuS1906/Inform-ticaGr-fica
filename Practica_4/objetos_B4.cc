@@ -48,6 +48,15 @@ _triangulos3D::_triangulos3D()
 	g = 0.5;
 	b = 0.7;
   //color por defecto
+
+
+	b_normales_caras=false;
+	b_normales_vertices=false;
+
+	ambiente_difusa=_vertex4f(0.2,0.4,0.9,1.0);  //coeficientes ambiente y difuso
+	especular=_vertex4f(0.5,0.5,0.5,1.0);        //coeficiente especular
+	brillo=40;  
+
 }
 
 //cambiar color
@@ -124,6 +133,137 @@ for (i=0;i<caras.size();i++){
 glEnd();
 }
 
+
+//*************************************************************************
+// calcular normales a caras
+//*************************************************************************
+
+
+void _triangulos3D::calcular_normales_caras()
+{  
+
+normales_caras.resize(caras.size());
+for(unsigned long i=0; i<caras.size(); i++){
+	// obtener dos vectores en el triángulo y calcular el producto vectorial
+	_vertex3f 
+        	 a1=vertices[caras[i]._1]-vertices[caras[i]._0],
+       		 a2=vertices[caras[i]._2]-vertices[caras[i]._0],
+         	 n=a1.cross_product(a2);
+	// modulo
+	float m=sqrt(n.x*n.x+n.y*n.y+n.z*n.z);
+	// normalización
+    	normales_caras[i]= _vertex3f(n.x/m, n.y/m, n.z/m);
+	}
+  
+b_normales_caras=true;
+
+}
+
+//*************************************************************************
+// calcular normales a vertices
+//*************************************************************************
+
+
+void _triangulos3D::calcular_normales_vertices()
+{
+
+ int i, n, m;
+ n = vertices.size();
+ m = caras.size();
+
+ normales_vertices.resize(n);
+
+ for (i = 0; i < n; i++)
+ {
+  	normales_vertices[i].x = 0.0;
+  	normales_vertices[i].y = 0.0;
+  	normales_vertices[i].z = 0.0;
+ }
+
+ for (i = 0; i < m; i++)
+ {
+  	normales_vertices[caras[i]._0] += normales_caras[i];
+  	normales_vertices[caras[i]._1] += normales_caras[i];
+  	normales_vertices[caras[i]._2] += normales_caras[i];
+  
+ }
+
+ b_normales_caras = true;
+
+}
+
+//*************************************************************************
+// iluninacion suave
+//*************************************************************************
+
+
+void _triangulos3D::draw_iluminacion_suave()
+{
+ if (b_normales_caras == false)
+  	calcular_normales_caras();
+ 
+ if (b_normales_vertices == false)
+  	calcular_normales_vertices();
+
+ glShadeModel(GL_SMOOTH);
+ glEnable(GL_LIGHTING);
+ glEnable(GL_NORMALIZE);
+
+ glMaterialfv(GL_AMBIENT_AND_DIFFUSE, GL_FRONT, (GLfloat *)&ambiente_difusa);
+ glMaterialfv(GL_SPECULAR, GL_FRONT, (GLfloat *)&especular);
+ glMaterialf(GL_SHININESS, GL_FRONT, brillo);
+
+ glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+ glBegin(GL_TRIANGLES);
+ for (int i = 0; i < caras.size(); i++)
+ {
+  	glNormal3fv((GLfloat *)&normales_vertices[caras[i]._0]);
+  	glVertex3fv((GLfloat *)&vertices[caras[i]._0]);
+
+  	glNormal3fv((GLfloat *)&normales_vertices[caras[i]._1]);
+  	glVertex3fv((GLfloat *)&vertices[caras[i]._1]);
+
+  	glNormal3fv((GLfloat *)&normales_vertices[caras[i]._2]);
+  	glVertex3fv((GLfloat *)&vertices[caras[i]._2]);
+ }
+ glEnd();
+ glDisable(GL_LIGHTING);
+
+}
+
+//*************************************************************************
+// iluminacion plana
+//*************************************************************************
+
+
+void _triangulos3D::draw_iluminacion_plana()
+
+{
+
+	int i;
+	if (b_normales_caras==false) calcular_normales_caras();
+
+	glShadeModel(GL_FLAT);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_NORMALIZE);
+
+	glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,(GLfloat *) &ambiente_difusa);
+	glMaterialfv(GL_FRONT,GL_SPECULAR,(GLfloat *) &especular);
+	glMaterialf(GL_FRONT,GL_SHININESS,brillo);
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	glBegin(GL_TRIANGLES);
+	for (i=0;i<caras.size();i++){
+		glNormal3fv((GLfloat *) &normales_caras[i]);
+			glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+		glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+	}
+	glEnd();
+	glDisable(GL_LIGHTING);
+
+}
+
+
 //*************************************************************************
 // dibujar con distintos modos
 //*************************************************************************
@@ -136,6 +276,8 @@ switch (modo){
 	case EDGES:draw_aristas(grosor);break;
 	case SOLID_CHESS:draw_solido_ajedrez(r2, g2, b2);break;
 	case SOLID:draw_solido();break;
+	case SOLID_ILLUMINATED_FLAT:draw_iluminacion_plana();break;
+	case SOLID_ILLUMINATED_GOURAUD:draw_iluminacion_suave();break;
 	case ALL: draw_puntos(r2, g2, b2, grosor); draw_aristas(grosor); draw_solido_ajedrez(r2, g2, b2); break;
 	}
 }

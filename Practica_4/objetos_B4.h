@@ -11,7 +11,7 @@
 using namespace std;
 
 const float AXIS_SIZE=5000;
-typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID, ALL} _modo;
+typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID,ALL,SOLID_ILLUMINATED_FLAT,SOLID_ILLUMINATED_GOURAUD} _modo;
 
 //*************************************************************************
 // clase punto
@@ -41,11 +41,29 @@ void 	draw_aristas(int grosor);
 void    draw_solido();
 void 	draw_solido_ajedrez(float r2, float g2, float b2);
 void 	draw(_modo modo,float r2, float g2, float b2, float grosor);
+
+void 	draw_iluminacion_plana( );
+void 	draw_iluminacion_suave( );
+
 void 	change_color (vector<float> color, int size);
 
+void	calcular_normales_caras();
+void 	calcular_normales_vertices();
 
 vector<_vertex3i> caras;
 float r,g,b;
+
+
+vector<_vertex3f> normales_caras;
+vector<_vertex3f> normales_vertices;
+
+bool b_normales_caras;
+bool b_normales_vertices;
+
+_vertex4f ambiente_difusa;     //coeficientes ambiente y difuso
+_vertex4f especular;           //coeficiente especular
+float brillo;                  //exponente del brillo 
+
 };
 
 
