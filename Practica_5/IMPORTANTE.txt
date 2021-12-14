@@ -1,0 +1,3 @@
+Diseñar el modelo jerarquico es a papel
+
+OJO en el 3.2 en lugar de 3 grados de libertad poner 4 puntos articulados
