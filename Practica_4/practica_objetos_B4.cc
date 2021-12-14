@@ -133,19 +133,54 @@ switch (t_objeto){
 
 }
 
+void luces (float alfa, float beta)
+{
+    float luz_ambiente[] = {0.2, 0.2, 0.2, 1.0},
+		  luz1[] = {1.0, 1.0, 1.0, 1.0},
+    	  pos1[] = {0, 20.0, 40.0, 1.0},
+		  luz2[] = {0.99, 0.2, 0.81, 1.0},
+    	  pos2[] = {-20, 20.0, 0.0, 1.0};
+	
+	glLightfv (GL_LIGHT0, GL_AMBIENT, luz_ambiente);
+    glLightfv (GL_LIGHT1, GL_DIFFUSE, luz1);
+    glLightfv (GL_LIGHT1, GL_SPECULAR, luz1);
 
+	glLightfv (GL_LIGHT2, GL_DIFFUSE, luz2);
+    glLightfv (GL_LIGHT2, GL_SPECULAR, luz2);
+
+	glPushMatrix();
+		glRotatef(alfa, 0, 1, 0);
+		glLightfv(GL_LIGHT1, GL_POSITION, pos1);
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(0, beta, 0);
+		glLightfv(GL_LIGHT2, GL_POSITION, pos2);
+	glPopMatrix();
+
+    // glLightfv (GL_LIGHT1, GL_DIFFUSE, luz1);
+    // glLightfv (GL_LIGHT1, GL_SPECULAR, luz1);
+    // glLightfv (GL_LIGHT1, GL_POSITION, pos1);
+    
+    glDisable (GL_LIGHT0);
+    glEnable (GL_LIGHT1);
+	glEnable(GL_LIGHT2);
+}
 //**************************************************************************
 //
 //***************************************************************************
 
 void draw(void)
 {
+	float alfa = 0.0,
+	  beta = 0.0;
+	clean_window();
+	change_observer();
+	luces(alfa, beta);
+	draw_axis();
+	draw_objects();
+	glutSwapBuffers();
 
-clean_window();
-change_observer();
-draw_axis();
-draw_objects();
-glutSwapBuffers();
 }
 
 
@@ -183,17 +218,20 @@ void normal_key(unsigned char Tecla1,int x,int y)
 {
 switch (toupper(Tecla1)){
 	case 'Q':exit(0);
-	case '1':modo=POINTS;break;
-	case '2':modo=EDGES;break;
-	case '3':modo=SOLID;break;
-	case '4':modo=SOLID_CHESS;break;
-	// case 'P':t_objeto=PIRAMIDE;break;
+	case '1':modo=POINTS;animacion = false;break;
+	case '2':modo=EDGES;animacion = false;break;
+	case '3':modo=SOLID;animacion = false;break;
+	case '4':modo=SOLID_CHESS;animacion = false;break;
+	//iluminacion
+	case '5':modo=SOLID_ILLUMINATED_FLAT;animacion = false;break;
+    case '6':modo=SOLID_ILLUMINATED_GOURAUD;animacion = false;break;
+	case 'P':t_objeto=PIRAMIDE;animacion = false;break;
 	// case 'C':t_objeto=CUBO;break;
 	// case 'O':t_objeto=OBJETO_PLY;break;	
 	// case 'R':t_objeto=ROTACION;break;
 	// case 'Z':t_objeto=CILINDRO;break;
 	// case 'X':t_objeto=CONO;break;
-	// case 'V':t_objeto=ESFERA;break;
+	case 'S':t_objeto=ESFERA;break;
 	// case 'S':t_objeto=UMBRELA;break;
 	case 'M':t_objeto=MEDUSA;break;
 	case 'A':
@@ -401,7 +439,7 @@ glutInitWindowSize(Window_width,Window_high);
 
 // llamada para crear la ventana, indicando el titulo (no se visualiza hasta que se llama
 // al bucle de eventos)
-glutCreateWindow("PRACTICA - 2");
+glutCreateWindow("PRACTICA - 4");
 
 // asignación de la funcion llamada "dibujar" al evento de dibujo
 glutDisplayFunc(draw);
