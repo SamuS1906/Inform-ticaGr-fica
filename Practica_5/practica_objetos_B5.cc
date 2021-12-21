@@ -214,8 +214,21 @@ void vista_orto(){
 	draw_axis();
 	draw_objects();
 
-	//Falta vista en perspectiva
+	//Vista en perspectiva
+	glViewport(Ancho/2,0,Ancho/2,Alto/2);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-5*factor,5*factor,-5*factor,5*factor,-100,100);
+	glRotatef(30,1,0,0);
+	glRotatef(30,0,1,0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
+	draw_axis();
+	draw_objects();
+
+	draw_axis();
+	draw_objects();
 
 }
 void draw(void)
@@ -408,6 +421,7 @@ void funcion_idle(){
 	}
 }
 
+
 //***************************************************************************
 // Funciones para manejo de eventos del ratón
 //***************************************************************************
@@ -427,7 +441,7 @@ void clickRaton( int boton, int estado, int x, int y )
 			estadoRaton[2] = 2;
 			xc=x;
 			yc=y;
-			//pick_color(xc, yc);
+			pick_color(xc, yc);
 		} 
 	}
 
@@ -467,38 +481,35 @@ void RatonMovido( int x, int y )
     }
 }
 
-// void procesar_color(unsigned char color[3])
-// {
-// 	int i;
 
-// 	for (i=0;i<tanque.piezas;i++){
-//    		if (color[0]==tanque.color_selec[0][i])
-//        		{if (tanque.activo[i]==0) {
-// 				tanque.activo[i]=1;
-// 			}
-// 			else{ 
-// 				tanque.activo[i]=0;
-// 			}
-//          glutPostRedisplay();
-//         }
-//     }                
-//  }
+void procesar_color(unsigned char color[3])
+{
+int i;
 
+for (i=0;i<medusa.piezas;i++)
+   {if (color[0]==medusa.color_selec[0][i])
+       {if (medusa.activo[i]==0)
+                      {medusa.activo[i]=1;
+                      }
+                  else
+                      {medusa.activo[i]=0;
+                      }
+         glutPostRedisplay();
+        }
+    }
+ }
 
+void pick_color(int x, int y){
+	GLint viewport[4];
+	unsigned char pixel[3];
 
-// void pick_color(int x, int y)
-// {
-// GLint viewport[4];
-// unsigned char pixel[3];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glReadBuffer(GL_BACK);
+	glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
+	printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
 
-// glGetIntegerv(GL_VIEWPORT, viewport);
-// glReadBuffer(GL_BACK);
-// glReadPixels(x,viewport[3]-y,1,1,GL_RGB,GL_UNSIGNED_BYTE,(GLubyte *) &pixel[0]);
-// printf(" valor x %d, valor y %d, color %d, %d, %d \n",x,y,pixel[0],pixel[1],pixel[2]);
-
-// procesar_color(pixel);
-// }
-
+	procesar_color(pixel);
+}
 
 //***************************************************************************
 // Funcion de incializacion
@@ -514,7 +525,7 @@ Front_plane=1;
 Back_plane=1000;
 
 // se incia la posicion del observador, en el eje z
-Observer_distance=4*Front_plane;
+Observer_distance=10*Front_plane;
 Observer_angle_x=0;
 Observer_angle_y=0;
 
@@ -542,9 +553,6 @@ glViewport(0,0,Window_width,Window_high);
 
 int main(int argc, char *argv[] )
 {
- 
-
-
 
 // perfil 
 
@@ -594,7 +602,7 @@ glutInitWindowSize(Window_width,Window_high);
 
 // llamada para crear la ventana, indicando el titulo (no se visualiza hasta que se llama
 // al bucle de eventos)
-glutCreateWindow("PRACTICA - 4");
+glutCreateWindow("PRACTICA - 5");
 
 // asignación de la funcion llamada "dibujar" al evento de dibujo
 glutDisplayFunc(draw);

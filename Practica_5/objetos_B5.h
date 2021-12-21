@@ -11,7 +11,7 @@
 using namespace std;
 
 const float AXIS_SIZE=5000;
-typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID,ALL,SOLID_ILLUMINATED_FLAT,SOLID_ILLUMINATED_GOURAUD} _modo;
+typedef enum{POINTS,EDGES,SOLID_CHESS,SOLID,ALL,SOLID_ILLUMINATED_FLAT,SOLID_ILLUMINATED_GOURAUD, SELECT} _modo;
 
 //*************************************************************************
 // clase punto
@@ -49,6 +49,7 @@ void 	change_color (vector<float> color, int size);
 
 void	calcular_normales_caras();
 void 	calcular_normales_vertices();
+void   draw_seleccion(int r, int g, int b);
 
 vector<_vertex3i> caras;
 float r,g,b;
@@ -278,6 +279,12 @@ public:
 void 	draw(_modo modo, float r2, float g2, float b2, float grosor);
 float getGiroTentaculosOrales();
 void setGiroTentaculosOrales(float valor);
+void seleccion();
+
+int piezas;
+int activo[3];
+int color_selec[3][3];
+int color_pick[3];
 
 float getFlexion11();
 float getFlexion12();
@@ -337,3 +344,5 @@ _tentaculos_venenosos tentaculos_venenosos6;
 _tentaculos_venenosos tentaculos_venenosos7;
 _tentaculos_venenosos tentaculos_venenosos8;
 };
+
+

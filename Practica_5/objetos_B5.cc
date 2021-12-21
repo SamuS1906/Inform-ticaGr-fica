@@ -44,7 +44,10 @@ glEnd();*/
 
 _triangulos3D::_triangulos3D()
 {
-
+	//Color secundario
+	r=0.3;
+	g=0.6;
+	b=0.3;
 
 	b_normales_caras=false;
 	b_normales_vertices=false;
@@ -281,6 +284,7 @@ switch (modo){
 	case SOLID:draw_solido();break;
 	case SOLID_ILLUMINATED_FLAT:draw_iluminacion_plana();break;
 	case SOLID_ILLUMINATED_GOURAUD:draw_iluminacion_suave();break;
+	case SELECT:draw_seleccion(r2, g2, b2);break;
 	}
 }
 
@@ -1355,7 +1359,17 @@ void _tentaculos_venenosos::setFlexion4(float valor){
 //************************************************************************
 _medusa::_medusa(){
 
+	int c=100;
+	piezas=10;
+	color_pick[0]=1.0;
+	color_pick[1]=3.0;
+	color_pick[2]=6.0;
 
+	for (int i=0;i<piezas;i++)
+	  {activo[i]=0;
+	   color_selec[0][i]=c;
+	   c=c+20;
+	  }
 }
 
 float _medusa::getGiroTentaculosOrales(){
@@ -1522,61 +1536,192 @@ void _medusa::setFlexion4(float valor){
 
 void _medusa::draw(_modo modo, float r2, float g2, float b2, float grosor){
 	
+float r_p, g_p, b_p;
+	r_p=color_pick[0];
+	g_p=color_pick[1];
+	b_p=color_pick[2];
+
 	glPushMatrix();
+	if(activo[0]==1){
+		umbrela.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		umbrela.draw(modo, r2, g2, b2, grosor);
+	}
 	glTranslatef(0,0,0);
-	umbrela.draw(modo, r2, g2, b2, grosor);
 	glPopMatrix();
 
 	glPushMatrix();
+	if(activo[0]==1){
+		tentaculos_orales.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_orales.draw(modo, r2, g2, b2, grosor);
+	}
+
 	glTranslatef(0,0,0);
-	tentaculos_orales.draw(modo, r2, g2, b2, grosor);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(9.5,0,0);
 	glRotatef(-90, 0, 1, 0);
-	tentaculos_venenosos1.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos1.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos1.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-9.5,0,0);
 	glRotatef(90, 0, 1, 0);
-	tentaculos_venenosos2.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos2.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos2.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(0,0,9.5);
 	glRotatef(180, 0, 1, 0);	
-	tentaculos_venenosos3.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos3.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos3.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 
 	glPushMatrix();
 	glTranslatef(0,0,-9.5);
-	tentaculos_venenosos4.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos4.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos4.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(6.71,0,6.71);
 	glRotatef(-135, 0, 1, 0);
-	tentaculos_venenosos5.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos5.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos5.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-6.71,0,6.71);
 	glRotatef(135, 0, 1, 0);
-	tentaculos_venenosos6.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos6.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos6.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-6.71,0,-6.71);
 	glRotatef(45, 0, 1, 0);
-	tentaculos_venenosos7.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos7.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos7.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(6.71,0,-6.71);
 	glRotatef(-45, 0, 1, 0);	
-	tentaculos_venenosos8.draw(modo, r2, g2, b2, grosor);
+	if(activo[0]==1){
+		tentaculos_venenosos8.draw(modo, r_p, g_p, b_p, grosor);
+	}else{
+		tentaculos_venenosos8.draw(modo, r2, g2, b2, grosor);
+	}
 	glPopMatrix();
+}
+
+void _medusa::seleccion()
+{
+	int c;
+	c= color_selec[0][0];
+	glPushMatrix();
+	umbrela.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][1];
+	glPushMatrix();
+	tentaculos_orales.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][2];
+	glPushMatrix();
+	glTranslatef(9.5,0,0);
+	glRotatef(-90, 0, 1, 0);
+	tentaculos_venenosos1.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][3];
+	glPushMatrix();
+	glTranslatef(-9.5,0,0);
+	glRotatef(90, 0, 1, 0);
+	tentaculos_venenosos2.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][4];
+	glPushMatrix();
+	glTranslatef(0,0,9.5);
+	glRotatef(180, 0, 1, 0);	
+	tentaculos_venenosos3.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][5];
+	glPushMatrix();
+	glTranslatef(0,0,-9.5);
+	tentaculos_venenosos4.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][6];
+	glPushMatrix();
+	glTranslatef(6.71,0,6.71);
+	glRotatef(-135, 0, 1, 0);
+	tentaculos_venenosos5.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][7];
+	glPushMatrix();
+	glTranslatef(-6.71,0,6.71);
+	glRotatef(135, 0, 1, 0);
+	tentaculos_venenosos6.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][8];
+	glPushMatrix();
+	glTranslatef(-6.71,0,-6.71);
+	glRotatef(45, 0, 1, 0);
+	tentaculos_venenosos7.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+	c= color_selec[0][9];
+	glPushMatrix();
+	glTranslatef(6.71,0,-6.71);
+	glRotatef(-45, 0, 1, 0);	
+	tentaculos_venenosos8.draw(SELECT, c, c, c, 1);
+	glPopMatrix();
+
+}
+
+void _triangulos3D::draw_seleccion(int r, int g, int b)
+{
+int i;
+
+glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+glColor3ub(r,g,b);
+glBegin(GL_TRIANGLES);
+for (i=0;i<caras.size();i++){
+	glVertex3fv((GLfloat *) &vertices[caras[i]._0]);
+	glVertex3fv((GLfloat *) &vertices[caras[i]._1]);
+	glVertex3fv((GLfloat *) &vertices[caras[i]._2]);
+	}
+glEnd();
 }
