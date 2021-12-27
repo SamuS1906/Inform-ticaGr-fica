@@ -37,8 +37,8 @@ class _triangulos3D: public _puntos3D
 public:
 
 	_triangulos3D();
-void 	draw_aristas(int grosor);
-void    draw_solido();
+void 	draw_aristas(float r, float g, float b, int grosor);
+void    draw_solido(float r, float g, float b);
 void 	draw_solido_ajedrez(float r2, float g2, float b2);
 void 	draw(_modo modo,float r2, float g2, float b2, float grosor);
 
@@ -282,8 +282,8 @@ void setGiroTentaculosOrales(float valor);
 void seleccion();
 
 int piezas;
-int activo[3];
-int color_selec[3][3];
+int activo[10];
+int color_selec[3][10];
 int color_pick[3];
 
 float getFlexion11();

@@ -44,10 +44,7 @@ glEnd();*/
 
 _triangulos3D::_triangulos3D()
 {
-	//Color secundario
-	r=0.3;
-	g=0.6;
-	b=0.3;
+
 
 	b_normales_caras=false;
 	b_normales_vertices=false;
@@ -64,7 +61,7 @@ _triangulos3D::_triangulos3D()
 // dibujar en modo arista
 //*************************************************************************
 
-void _triangulos3D::draw_aristas(int grosor)
+void _triangulos3D::draw_aristas(float r, float g, float b, int grosor)
 {
 //**** usando vertex_array ****
 glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -92,8 +89,9 @@ glEnd();*/
 // dibujar en modo sólido
 //*************************************************************************
 
-void _triangulos3D::draw_solido()
+void _triangulos3D::draw_solido(float r, float g, float b)
 {
+	
 int i;
 
 glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
@@ -114,6 +112,9 @@ glEnd();
 void _triangulos3D::draw_solido_ajedrez(float r2, float g2, float b2)
 {
 int i;
+r=0.0;
+g=1.0;
+b=2.0;
 glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 glBegin(GL_TRIANGLES);
 for (i=0;i<caras.size();i++){
@@ -279,9 +280,9 @@ void _triangulos3D::draw(_modo modo, float r2, float g2, float b2, float grosor)
 {
 switch (modo){
 	case POINTS:draw_puntos(r2,g2,b2,grosor);break;
-	case EDGES:draw_aristas(grosor);break;
+	case EDGES:draw_aristas(r2,g2,b2,grosor);break;
 	case SOLID_CHESS:draw_solido_ajedrez(r2, g2, b2);break;
-	case SOLID:draw_solido();break;
+	case SOLID:draw_solido(r2,g2,b2);break;
 	case SOLID_ILLUMINATED_FLAT:draw_iluminacion_plana();break;
 	case SOLID_ILLUMINATED_GOURAUD:draw_iluminacion_suave();break;
 	case SELECT:draw_seleccion(r2, g2, b2);break;
@@ -1359,7 +1360,7 @@ void _tentaculos_venenosos::setFlexion4(float valor){
 //************************************************************************
 _medusa::_medusa(){
 
-	int c=100;
+	int c=10;
 	piezas=10;
 	color_pick[0]=1.0;
 	color_pick[1]=3.0;
@@ -1367,8 +1368,8 @@ _medusa::_medusa(){
 
 	for (int i=0;i<piezas;i++)
 	  {activo[i]=0;
-	   color_selec[0][i]=c;
-	   c=c+20;
+	   color_selec[0][i]=color_selec[1][i]=color_selec[2][i]=c;
+	   c=c+10;
 	  }
 }
 
@@ -1551,7 +1552,7 @@ float r_p, g_p, b_p;
 	glPopMatrix();
 
 	glPushMatrix();
-	if(activo[0]==1){
+	if(activo[1]==1){
 		tentaculos_orales.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_orales.draw(modo, r2, g2, b2, grosor);
@@ -1563,7 +1564,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(9.5,0,0);
 	glRotatef(-90, 0, 1, 0);
-	if(activo[0]==1){
+	if(activo[2]==1){
 		tentaculos_venenosos1.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos1.draw(modo, r2, g2, b2, grosor);
@@ -1573,7 +1574,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(-9.5,0,0);
 	glRotatef(90, 0, 1, 0);
-	if(activo[0]==1){
+	if(activo[3]==1){
 		tentaculos_venenosos2.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos2.draw(modo, r2, g2, b2, grosor);
@@ -1583,7 +1584,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(0,0,9.5);
 	glRotatef(180, 0, 1, 0);	
-	if(activo[0]==1){
+	if(activo[4]==1){
 		tentaculos_venenosos3.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos3.draw(modo, r2, g2, b2, grosor);
@@ -1593,7 +1594,7 @@ float r_p, g_p, b_p;
 
 	glPushMatrix();
 	glTranslatef(0,0,-9.5);
-	if(activo[0]==1){
+	if(activo[5]==1){
 		tentaculos_venenosos4.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos4.draw(modo, r2, g2, b2, grosor);
@@ -1603,7 +1604,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(6.71,0,6.71);
 	glRotatef(-135, 0, 1, 0);
-	if(activo[0]==1){
+	if(activo[6]==1){
 		tentaculos_venenosos5.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos5.draw(modo, r2, g2, b2, grosor);
@@ -1613,7 +1614,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(-6.71,0,6.71);
 	glRotatef(135, 0, 1, 0);
-	if(activo[0]==1){
+	if(activo[7]==1){
 		tentaculos_venenosos6.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos6.draw(modo, r2, g2, b2, grosor);
@@ -1623,7 +1624,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(-6.71,0,-6.71);
 	glRotatef(45, 0, 1, 0);
-	if(activo[0]==1){
+	if(activo[8]==1){
 		tentaculos_venenosos7.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos7.draw(modo, r2, g2, b2, grosor);
@@ -1633,7 +1634,7 @@ float r_p, g_p, b_p;
 	glPushMatrix();
 	glTranslatef(6.71,0,-6.71);
 	glRotatef(-45, 0, 1, 0);	
-	if(activo[0]==1){
+	if(activo[9]==1){
 		tentaculos_venenosos8.draw(modo, r_p, g_p, b_p, grosor);
 	}else{
 		tentaculos_venenosos8.draw(modo, r2, g2, b2, grosor);

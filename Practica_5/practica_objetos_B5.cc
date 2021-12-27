@@ -233,23 +233,32 @@ void vista_orto(){
 }
 void draw(void)
 {
-	float alfa = 0.0,
-	  beta = 0.0;
-	glDrawBuffer(GL_FRONT);
 
 	clean_window();
-	if(cambio==0){
-		glViewport(0,0, Ancho,Alto);
+
+	if(cambio == 0){
+		glViewport(0,0,Ancho,Alto);
 		change_projection();
 		change_observer();
-		luces(alfa, beta);
 		draw_axis();
 		draw_objects();
-		//glutSwapBuffers();
-	}else{ 
+
+	}else{
+		luces(0.5,0.1);
 		vista_orto();
 	}
 
+	luces(0.5,0.1);
+	draw_axis();
+	draw_objects();
+	glutSwapBuffers();
+
+	if(t_objeto == MEDUSA){
+		glDrawBuffer(GL_BACK);
+	  clean_window();
+	  change_observer();
+	  medusa.seleccion();
+	}
 	glFlush();
 
 }
